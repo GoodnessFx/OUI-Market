@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut, Bell, MessageSquare, HelpCircle, ShieldAlert, Info, Headphones } from "lucide-react";
+import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut, Bell, MessageSquare, HelpCircle, ShieldAlert, Info, Headphones, ShieldCheck, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -12,7 +12,6 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
   const [copied, setCopied] = useState(false);
 
   if (!user) {
-    // If not logged in, show a simple message or redirect
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -29,17 +28,6 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
     toast.success("Logged out successfully");
   };
 
-  const handleSimulateReferral = () => {
-    updateBalance(500);
-    addNotification({
-      title: "Referral Bonus!",
-      message: "You just earned ₦500 from a new student referral.",
-      time: "Just now",
-      type: "order"
-    });
-    toast.success("₦500 added to your wallet!");
-  };
-
   const copyReferral = () => {
     navigator.clipboard.writeText(user.referralCode);
     setCopied(true);
@@ -49,60 +37,102 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
 
   const renderView = () => {
     switch (view) {
+      case "profile":
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="h-32 w-32 rounded-[2.5rem] bg-slate-50 flex items-center justify-center text-4xl font-black text-primary border-4 border-white shadow-xl">
+                  {user.name[0]}
+                </div>
+                <div className="flex-1 text-center md:text-left space-y-2">
+                  <h2 className="text-3xl font-black text-[#0F172A] tracking-tight">{user.name}</h2>
+                  <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">{user.email}</p>
+                  <div className="flex flex-wrap justify-center md:justify-start gap-2 pt-2">
+                    <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest">
+                      {user.isVendor ? 'Verified Vendor' : 'Verified Student'}
+                    </span>
+                    <span className="px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                      Member since 2026
+                    </span>
+                  </div>
+                </div>
+                <Button variant="outline" className="rounded-2xl font-black text-xs uppercase tracking-widest h-12 px-6">
+                  Edit Profile
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { label: "Wallet Balance", value: `₦${user.walletBalance.toLocaleString()}`, icon: Wallet, color: "text-emerald-500", bg: "bg-emerald-50" },
+                { label: "Total Orders", value: "12", icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
+                { label: "Trust Score", value: "98%", icon: ShieldCheck, color: "text-amber-500", bg: "bg-amber-50" }
+              ].map((stat, i) => (
+                <div key={i} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
+                  <div className={`h-12 w-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                    <p className="text-xl font-black text-[#0F172A]">{stat.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#0F172A] rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md">
+                    <Gift className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-black tracking-tight">Referral Program</h3>
+                </div>
+                <p className="text-white/60 font-medium mb-8 max-w-md">
+                  Invite your fellow students to OUI Market and earn ₦500 for every successful registration.
+                </p>
+                <div className="flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/10 max-w-sm">
+                  <code className="flex-1 px-4 font-black tracking-widest text-primary">{user.referralCode}</code>
+                  <Button onClick={copyReferral} className="bg-white text-[#0F172A] hover:bg-slate-100 rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest">
+                    {copied ? "Copied!" : "Copy Code"}
+                  </Button>
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 p-12 opacity-10 rotate-12">
+                <Share2 className="h-64 w-64" />
+              </div>
+            </div>
+          </div>
+        );
       case "notifications":
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between px-4">
-              <h2 className="text-2xl font-black text-[#0F172A]">All Notifications</h2>
-              <Button 
-                variant="ghost" 
-                onClick={markAllNotificationsRead}
-                className="text-xs font-black uppercase tracking-widest text-primary hover:bg-primary/5"
-              >
-                Mark all as read
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-black text-[#0F172A] tracking-tight">Activity Feed</h2>
+              <Button variant="ghost" onClick={markAllNotificationsRead} className="text-xs font-black uppercase tracking-widest text-primary">
+                Mark all read
               </Button>
             </div>
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {notifications.length > 0 ? (
                 notifications.map((n) => (
-                  <Card 
-                    key={n.id} 
-                    className={`border-2 transition-all rounded-[2rem] overflow-hidden ${n.read ? 'border-slate-50 opacity-60' : 'border-primary/10 bg-primary/5 shadow-lg shadow-primary/5'}`}
-                  >
-                    <CardContent className="p-8">
-                      <div className="flex items-start gap-6">
-                        <div className={`h-16 w-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                          n.type === 'order' ? 'bg-orange-100 text-orange-600' : 
-                          n.type === 'message' ? 'bg-blue-100 text-blue-600' : 
-                          n.type === 'sale' ? 'bg-green-100 text-green-600' :
-                          n.type === 'payout' ? 'bg-purple-100 text-purple-600' :
-                          'bg-slate-100 text-slate-600'
-                        }`}>
-                          {n.type === 'order' ? <Package className="h-8 w-8" /> : 
-                           n.type === 'message' ? <MessageSquare className="h-8 w-8" /> : 
-                           n.type === 'sale' ? <TrendingUp className="h-8 w-8" /> :
-                           n.type === 'payout' ? <CreditCard className="h-8 w-8" /> :
-                           <Bell className="h-8 w-8" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-black text-lg text-[#0F172A]">{n.title}</h4>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{n.time}</span>
-                          </div>
-                          <p className="text-slate-500 font-medium leading-relaxed text-sm">{n.message}</p>
-                          {!n.read && (
-                            <Button 
-                              variant="link" 
-                              onClick={() => markNotificationRead(n.id)}
-                              className="p-0 h-auto mt-4 text-xs font-black uppercase tracking-widest text-primary"
-                            >
-                              Mark as read
-                            </Button>
-                          )}
-                        </div>
+                  <div key={n.id} className={`p-6 rounded-[2rem] border transition-all flex items-start gap-4 ${n.read ? 'bg-white border-slate-100 opacity-60' : 'bg-white border-primary/20 shadow-lg shadow-primary/5'}`}>
+                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                      n.type === 'order' ? 'bg-orange-50 text-orange-500' : 
+                      n.type === 'message' ? 'bg-blue-50 text-blue-500' : 
+                      'bg-slate-50 text-slate-500'
+                    }`}>
+                      {n.type === 'order' ? <Package className="h-6 w-6" /> : <Bell className="h-6 w-6" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-black text-sm text-[#0F172A]">{n.title}</h4>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">{n.time}</span>
                       </div>
-                    </CardContent>
-                  </Card>
+                      <p className="text-slate-500 text-xs font-medium leading-relaxed">{n.message}</p>
+                    </div>
+                  </div>
                 ))
               ) : (
                 <div className="text-center py-20 bg-white border-2 border-dashed border-slate-100 rounded-[3rem]">
@@ -288,80 +318,30 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
                 </button>
               </CardContent>
             </Card>
+
+            <div className="pt-8 px-4">
+              <Button variant="ghost" onClick={handleLogout} className="text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-2xl h-14 px-8 font-black text-xs uppercase tracking-widest">
+                <LogOut className="h-5 w-5 mr-3" />
+                Delete Account
+              </Button>
+            </div>
           </div>
         );
       case "orders":
         return (
-          <div className="text-center py-20 bg-white border-2 border-dashed border-slate-100 rounded-[3rem]">
-            <Package className="h-16 w-16 text-slate-200 mx-auto mb-6" />
-            <h3 className="text-2xl font-black text-[#0F172A] mb-2">No active orders</h3>
-            <p className="text-slate-500 font-medium">Your recent orders will appear here once you make a purchase.</p>
-            <Button onClick={() => window.location.hash = "#/"} className="mt-8 bg-[#0F172A] text-white font-black px-8 h-12 rounded-xl">Start Shopping</Button>
+          <div className="py-20 text-center">
+            <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="h-10 w-10 text-slate-200" />
+            </div>
+            <h3 className="text-xl font-black text-[#0F172A]">No orders yet</h3>
+            <p className="text-slate-500 font-medium mt-1">Start shopping to see your orders here.</p>
+            <Button onClick={() => window.location.hash = "#/"} className="mt-8 rounded-2xl h-12 px-8 font-black text-xs uppercase tracking-widest">
+              Explore Marketplace
+            </Button>
           </div>
         );
       default:
-        return (
-          <div className="grid lg:grid-cols-3 gap-8">
-            <Card className="lg:col-span-1 border-2 border-slate-100 rounded-[2.5rem] overflow-hidden h-fit shadow-sm">
-              <div className="bg-slate-900 p-8 text-center text-white relative">
-                <div className="relative z-10">
-                  <div className="h-24 w-24 rounded-[2rem] bg-white/10 backdrop-blur-xl border-2 border-white/20 flex items-center justify-center text-4xl font-black mx-auto mb-6 shadow-2xl">
-                    {user.name[0]}
-                  </div>
-                  <h3 className="text-2xl font-black mb-1">{user.name}</h3>
-                  <p className="text-xs text-white/50 font-bold uppercase tracking-widest">{user.email}</p>
-                  <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 bg-primary/20 border border-primary/30 rounded-full">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Verified Student</span>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="p-8 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Member Since</span>
-                  <span className="font-black text-[#0F172A]">June 2026</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Account Type</span>
-                  <span className="font-black text-[#0F172A]">Student Buyer</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Campus</span>
-                  <span className="font-black text-[#0F172A]">OUI Main Campus</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="border-2 border-slate-100 rounded-[2.5rem] shadow-sm">
-                <CardHeader className="p-8 pb-0">
-                  <CardTitle className="text-xl font-black">Personal Information</CardTitle>
-                </CardHeader>
-                <CardContent className="p-8 space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
-                      <Input defaultValue={user.name} className="h-12 rounded-xl bg-slate-50 border-none font-bold" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
-                      <Input defaultValue={user.email} disabled className="h-12 rounded-xl bg-slate-50 border-none font-bold opacity-50" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</label>
-                      <Input placeholder="+234 000 000 0000" className="h-12 rounded-xl bg-slate-50 border-none font-bold" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Student ID</label>
-                      <Input placeholder="OUI/STU/..." className="h-12 rounded-xl bg-slate-50 border-none font-bold" />
-                    </div>
-                  </div>
-                  <Button className="h-14 px-10 bg-primary text-white font-black text-lg rounded-2xl shadow-xl shadow-primary/20">Update Profile</Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        );
+        return null;
     }
   };
 

@@ -70,7 +70,33 @@ export function PaymentModal({ isOpen, onClose, amount, itemName }: { isOpen: bo
               </TabsList>
 
               <TabsContent value="naira" className="space-y-4">
-                <div className="space-y-4">
+                <div className="grid gap-4">
+                  <div className="p-6 rounded-[2rem] bg-slate-50 border-2 border-slate-100 flex items-start gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <ShieldCheck className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-sm text-[#0F172A]">Smart Escrow Protection</h4>
+                      <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                        Your funds are secured by OUI's Smart Escrow. The vendor only receives payment after you confirm delivery.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 rounded-[2rem] bg-emerald-50 border-2 border-emerald-100 flex items-start gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-sm text-[#0F172A]">Verified OUI Vendor</h4>
+                      <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                        This vendor has been identity-verified by the OUI Market security team.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4">
                   <div className="p-4 border-2 border-primary/20 rounded-2xl bg-primary/5 flex items-center gap-4">
                     <CreditCard className="h-6 w-6 text-primary" />
                     <div>

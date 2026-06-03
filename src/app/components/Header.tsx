@@ -7,12 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "./ui/scroll-area";
 
 export function Header() {
-  const { user, notifications, markNotificationRead, markAllNotificationsRead, setSupportOpen, logout } = useStore();
+  const { user, notifications, cart, markNotificationRead, markAllNotificationsRead, setSupportOpen, logout } = useStore();
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const cartRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     logout();
@@ -28,6 +30,9 @@ export function Header() {
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
+      if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
+        setShowCart(false);
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -35,6 +40,7 @@ export function Header() {
   }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
@@ -257,12 +263,85 @@ export function Header() {
               </AnimatePresence>
             </div>
 
-            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-slate-100 text-slate-600 relative">
-              <ShoppingCart className="h-6 w-6" />
-              <span className="absolute top-2.5 right-2.5 h-4 w-4 rounded-full bg-[#0F172A] text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white">
-                2
-              </span>
-            </Button>
+            <div className="relative" ref={cartRef}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`relative h-12 w-12 rounded-2xl transition-all ${showCart ? 'bg-primary/10 text-primary' : 'hover:bg-slate-100 text-slate-600'}`}
+                onClick={() => {
+                  setShowCart(!showCart);
+                  setShowNotifications(false);
+                  setShowAccountMenu(false);
+                }}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartCount > 0 && (
+                  <span className="absolute top-2.5 right-2.5 h-4 w-4 rounded-full bg-[#0F172A] text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+              <AnimatePresence>
+                {showCart && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-4 w-[380px] bg-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-50"
+                  >
+                    <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+                      <h3 className="text-lg font-black text-[#0F172A]">Your Cart</h3>
+                      <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-widest">{cartCount} Items</span>
+                    </div>
+                    <ScrollArea className="h-[350px]">
+                      <div className="p-4 space-y-4">
+                        {cart.length > 0 ? (
+                          cart.map((item) => (
+                            <div key={item.id} className="flex items-center gap-4 group">
+                              <div className="h-16 w-16 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0">
+                                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-sm font-black text-[#0F172A] truncate">{item.name}</h4>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.vendor}</p>
+                                <div className="flex items-center justify-between mt-1">
+                                  <span className="text-sm font-black text-primary">₦{item.price.toLocaleString()}</span>
+                                  <span className="text-xs font-bold text-slate-400">Qty: {item.quantity}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="py-12 text-center">
+                            <ShoppingCart className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                            <p className="text-sm font-bold text-slate-400">Your cart is empty</p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                    {cart.length > 0 && (
+                      <div className="p-6 bg-slate-50 border-t border-slate-100">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm font-bold text-slate-500">Total</span>
+                          <span className="text-xl font-black text-[#0F172A]">
+                            ₦{cart.reduce((acc, item) => acc + (item.price * item.quantity), 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <Button 
+                          onClick={() => {
+                            window.location.hash = "#/checkout";
+                            setShowCart(false);
+                          }}
+                          className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-black rounded-2xl shadow-xl shadow-primary/20"
+                        >
+                          Checkout Now
+                        </Button>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>

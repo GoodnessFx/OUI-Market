@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 
-interface Review {
-  id: string;
-  productId: number;
-  userName: string;
-  rating: number;
-  comment: string;
-  time: string;
+interface CartProduct {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  vendor: string;
+}
+
+interface CartItem extends CartProduct {
+  quantity: number;
 }
 
 interface Notification {
@@ -40,10 +43,20 @@ interface Message {
   userId: string;
 }
 
+interface Review {
+  id: string;
+  productId: number;
+  userName: string;
+  rating: number;
+  comment: string;
+  time: string;
+}
+
 interface AppState {
   user: User | null;
   notifications: Notification[];
   reviews: Review[];
+  cart: (CartProduct & { quantity: number })[];
   isSupportOpen: boolean;
   supportMessages: Message[];
   setSupportOpen: (open: boolean) => void;
@@ -51,6 +64,9 @@ interface AppState {
   markAllNotificationsRead: () => void;
   addNotification: (n: Omit<Notification, 'id' | 'read'>) => void;
   addReview: (r: Omit<Review, 'id' | 'time'>) => void;
+  addToCart: (p: CartProduct) => void;
+  removeFromCart: (productId: number) => void;
+  clearCart: () => void;
   login: (user: User) => void;
   logout: () => void;
   updateBalance: (amount: number) => void;
@@ -116,6 +132,7 @@ export const useStore = create<AppState>((set) => ({
       time: '1 week ago'
     }
   ],
+  cart: [],
   supportMessages: [
     {
       id: "1",
@@ -153,6 +170,21 @@ export const useStore = create<AppState>((set) => ({
       ...state.reviews
     ]
   })),
+  addToCart: (p) => set((state) => {
+    const existing = state.cart.find(item => item.id === p.id);
+    if (existing) {
+      return {
+        cart: state.cart.map(item => 
+          item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      };
+    }
+    return { cart: [...state.cart, { ...p, quantity: 1 }] };
+  }),
+  removeFromCart: (productId) => set((state) => ({
+    cart: state.cart.filter(item => item.id !== productId)
+  })),
+  clearCart: () => set({ cart: [] }),
   login: (user) => set({ user }),
   logout: () => set({ user: null }),
   updateBalance: (amount) => set((state) => ({

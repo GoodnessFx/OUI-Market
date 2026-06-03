@@ -70,6 +70,8 @@ export default function App() {
         return <UserDashboard view="wallet" />;
       case "#/orders":
         return <UserDashboard view="orders" />;
+      case "#/wishlist":
+        return <UserDashboard view="wishlist" />;
       case "#/settings":
         return <UserDashboard view="settings" />;
       default:

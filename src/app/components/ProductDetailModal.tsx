@@ -25,7 +25,7 @@ interface Product {
 }
 
 export function ProductDetailModal({ product, isOpen, onClose }: { product: Product | null, isOpen: boolean, onClose: () => void }) {
-  const { reviews, addReview, user } = useStore();
+  const { reviews, addReview, addToCart, user } = useStore();
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(5);
@@ -33,6 +33,19 @@ export function ProductDetailModal({ product, isOpen, onClose }: { product: Prod
   if (!product) return null;
 
   const productReviews = reviews.filter(r => r.productId === product.id);
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      vendor: product.vendor
+    });
+    toast.success("Added to cart!", {
+      description: `${product.name} has been added to your shopping cart.`,
+    });
+  };
 
   const handleAddReview = () => {
     if (!newComment.trim()) return;
@@ -113,6 +126,14 @@ export function ProductDetailModal({ product, isOpen, onClose }: { product: Prod
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available Balance: ₦{user?.walletBalance.toLocaleString() || 0}</p>
                   </div>
 
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center gap-3">
+                    <ShieldCheck className="h-5 w-5 text-blue-500" />
+                    <div>
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none">Smart Escrow Active</p>
+                      <p className="text-[9px] text-blue-400 font-bold uppercase mt-1">Funds secured until delivery</p>
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
                     <h3 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">Product Description</h3>
                     <p className="text-slate-500 text-sm font-medium leading-relaxed">
@@ -179,7 +200,7 @@ export function ProductDetailModal({ product, isOpen, onClose }: { product: Prod
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => toast.success("Added to cart!")}
+                  onClick={handleAddToCart}
                   className="h-14 w-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center hover:bg-slate-50 transition-all"
                 >
                   <ShoppingCart className="h-6 w-6 text-slate-600" />
