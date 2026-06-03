@@ -40,16 +40,7 @@ export function Header() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-10 text-xs">
             <div className="flex items-center gap-6">
-              <a href="#/vendor" className="text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider">
-                Sell on OUIMarket
-              </a>
-              <div className="h-3 w-px bg-slate-200" />
-              <button 
-                onClick={() => setSupportOpen(true)}
-                className="text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
-              >
-                Contact Support
-              </button>
+              {/* Top links removed as per user request for professional look */}
             </div>
             <div className="flex items-center gap-4">
               <div className="relative" ref={helpMenuRef}>
@@ -101,51 +92,54 @@ export function Header() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 top-full mt-2 w-72 bg-white rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50"
+                      className="absolute right-0 top-full mt-2 w-80 bg-white rounded-[2.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50"
                     >
-                      <div className="bg-slate-900 p-6 text-white">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-xl font-black shadow-lg">
+                      <div className="bg-[#0F172A] p-8 text-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-5">
+                          <User className="h-32 w-32" />
+                        </div>
+                        <div className="flex items-center gap-5 mb-6 relative z-10">
+                          <div className="h-16 w-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl font-black shadow-2xl">
                             {user.name[0]}
                           </div>
                           <div>
-                            <p className="font-black text-sm">{user.name}</p>
-                            <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{user.email}</p>
+                            <p className="font-black text-xl tracking-tighter">{user.name}</p>
+                            <p className="text-[10px] text-white/50 font-bold uppercase tracking-widest">{user.email}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full w-fit">
-                          <CheckCircle2 className="h-3 w-3 text-primary" />
-                          <span className="text-[9px] font-black uppercase tracking-widest">Verified Student</span>
+                        <div className="flex items-center gap-2 px-4 py-1.5 bg-primary/20 border border-primary/30 rounded-full w-fit relative z-10">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Verified Student</span>
                         </div>
                       </div>
-                      <div className="p-4 grid grid-cols-2 gap-2">
-                        <a href="#/account" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
-                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                            <User className="h-5 w-5" />
+                      <div className="p-6 grid grid-cols-2 gap-3">
+                        <a href="#/account" onClick={() => setShowAccountMenu(false)} className="flex flex-col items-center gap-2 p-4 rounded-3xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100">
+                          <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <User className="h-6 w-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Profile</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Profile</span>
                         </a>
-                        <a href="#/orders" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
-                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                            <Package className="h-5 w-5" />
+                        <a href="#/orders" onClick={() => setShowAccountMenu(false)} className="flex flex-col items-center gap-2 p-4 rounded-3xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100">
+                          <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <Package className="h-6 w-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Orders</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Orders</span>
                         </a>
-                        <a href="#/wallet" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
-                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                            <CreditCard className="h-5 w-5" />
+                        <a href="#/wallet" onClick={() => setShowAccountMenu(false)} className="flex flex-col items-center gap-2 p-4 rounded-3xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100">
+                          <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <CreditCard className="h-6 w-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Wallet</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Wallet</span>
                         </a>
-                        <a href="#/settings" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
-                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                            <Settings className="h-5 w-5" />
+                        <a href="#/settings" onClick={() => setShowAccountMenu(false)} className="flex flex-col items-center gap-2 p-4 rounded-3xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100">
+                          <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <Settings className="h-6 w-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Settings</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Settings</span>
                         </a>
                       </div>
-                      <div className="p-4 border-t border-slate-50">
-                        <button className="w-full flex items-center justify-center gap-3 py-3 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors font-black text-xs uppercase tracking-widest">
+                      <div className="p-6 border-t border-slate-50 bg-slate-50/50">
+                        <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-rose-500 hover:bg-rose-500 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm hover:shadow-rose-200">
                           <LogOut className="h-4 w-4" />
                           Logout Account
                         </button>

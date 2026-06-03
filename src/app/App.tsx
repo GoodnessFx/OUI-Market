@@ -17,8 +17,8 @@ import { VendorPortal } from "./components/VendorPortal";
 import { JobMarketplace } from "./components/JobMarketplace";
 import { ChatSystem } from "./components/ChatSystem";
 import { ProductListing } from "./components/ProductListing";
-import { WhatsAppButton } from "./components/WhatsAppButton";
 import { HelpCenter } from "./components/HelpCenter";
+import { UserDashboard } from "./components/UserDashboard";
 import { useState, useEffect } from "react";
 import { useStore } from "./components/utils/store";
 
@@ -59,6 +59,14 @@ export default function App() {
         return <ChatSystem />;
       case "#/help":
         return <HelpCenter />;
+      case "#/account":
+        return <UserDashboard view="profile" />;
+      case "#/wallet":
+        return <UserDashboard view="wallet" />;
+      case "#/orders":
+        return <UserDashboard view="orders" />;
+      case "#/settings":
+        return <UserDashboard view="settings" />;
       default:
         return (
           <>
@@ -90,7 +98,6 @@ export default function App() {
           <Footer />
           <CookieConsent />
           <SupportChat />
-          <WhatsAppButton />
         </div>
       )}
     </>

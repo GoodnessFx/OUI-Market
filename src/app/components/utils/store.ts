@@ -7,6 +7,10 @@ interface User {
   avatar?: string;
   isVendor: boolean;
   verified: boolean;
+  walletBalance: number;
+  referralCode: string;
+  referralsCount: number;
+  referralEarnings: number;
 }
 
 interface Notification {
@@ -26,6 +30,7 @@ interface AppState {
   markNotificationRead: (id: string) => void;
   login: (user: User) => void;
   logout: () => void;
+  updateBalance: (amount: number) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -35,7 +40,11 @@ export const useStore = create<AppState>((set) => ({
     email: 'adebayo.m@oduduwa.edu.ng',
     isVendor: false,
     verified: true,
-    avatar: 'https://i.pravatar.cc/150?u=adebayo'
+    avatar: 'https://i.pravatar.cc/150?u=adebayo',
+    walletBalance: 12500,
+    referralCode: 'OUI-ADE-2026',
+    referralsCount: 8,
+    referralEarnings: 4000
   },
   notifications: [
     {
@@ -69,5 +78,8 @@ export const useStore = create<AppState>((set) => ({
     notifications: state.notifications.map(n => n.id === id ? { ...n, read: true } : n)
   })),
   login: (user) => set({ user }),
-  logout: () => set({ user: null })
+  logout: () => set({ user: null }),
+  updateBalance: (amount) => set((state) => ({
+    user: state.user ? { ...state.user, walletBalance: state.user.walletBalance + amount } : null
+  }))
 }));
