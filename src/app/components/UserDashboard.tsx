@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut, Bell, MessageSquare } from "lucide-react";
+import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut, Bell, MessageSquare, HelpCircle, ShieldAlert, Info, Headphones } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -8,10 +8,26 @@ import { useStore } from "./utils/store";
 import { toast } from "sonner";
 
 export function UserDashboard({ view = "profile" }: { view?: string }) {
-  const { user, notifications, markNotificationRead, markAllNotificationsRead, updateBalance, addNotification } = useStore();
+  const { user, notifications, markNotificationRead, markAllNotificationsRead, updateBalance, addNotification, setSupportOpen, logout } = useStore();
   const [copied, setCopied] = useState(false);
 
-  if (!user) return null;
+  if (!user) {
+    // If not logged in, show a simple message or redirect
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-black mb-4">Please log in to view dashboard</h2>
+          <Button onClick={() => window.location.hash = "#/"}>Back to Home</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+    window.location.hash = "#/";
+    toast.success("Logged out successfully");
+  };
 
   const handleSimulateReferral = () => {
     updateBalance(500);
@@ -188,6 +204,92 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
             </Card>
           </div>
         );
+      case "settings":
+        return (
+          <div className="space-y-8">
+            <Card className="border-2 border-slate-100 rounded-[2.5rem] shadow-sm">
+              <CardHeader className="p-8 pb-0">
+                <CardTitle className="text-xl font-black">Account Settings</CardTitle>
+                <CardDescription className="font-bold">Manage your account preferences and security.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <button className="flex items-center justify-between p-6 rounded-[2rem] bg-slate-50 hover:bg-white border-2 border-transparent hover:border-slate-100 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:text-primary transition-colors">
+                        <ShieldAlert className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-black text-sm">Privacy & Security</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Passwords, 2FA, Sessions</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-primary transition-all" />
+                  </button>
+                  <button className="flex items-center justify-between p-6 rounded-[2rem] bg-slate-50 hover:bg-white border-2 border-transparent hover:border-slate-100 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:text-primary transition-colors">
+                        <Bell className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-black text-sm">Notifications</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Email, Push, Alerts</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-primary transition-all" />
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-slate-100 rounded-[2.5rem] shadow-sm overflow-hidden">
+              <CardHeader className="p-8 pb-0">
+                <CardTitle className="text-xl font-black">Help & Support</CardTitle>
+                <CardDescription className="font-bold">Get assistance and find answers to your questions.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 grid md:grid-cols-2 gap-4">
+                <button 
+                  onClick={() => setSupportOpen(true)}
+                  className="flex items-center gap-4 p-6 rounded-[2rem] bg-primary/5 hover:bg-primary/10 border-2 border-transparent hover:border-primary/20 transition-all group"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-primary">
+                    <Headphones className="h-6 w-6" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-black text-sm text-primary">Help Center</p>
+                    <p className="text-[10px] font-bold text-primary/60 uppercase">Chat with our 24/7 support</p>
+                  </div>
+                </button>
+                
+                <button 
+                  onClick={() => window.location.hash = "#/help#faq"}
+                  className="flex items-center gap-4 p-6 rounded-[2rem] bg-slate-50 hover:bg-white border-2 border-transparent hover:border-slate-100 transition-all group"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:text-primary transition-colors">
+                    <Info className="h-6 w-6" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-black text-sm">FAQs</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Find quick answers</p>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => window.location.hash = "#/report"}
+                  className="flex items-center gap-4 p-6 rounded-[2rem] bg-rose-50 hover:bg-rose-100 border-2 border-transparent hover:border-rose-200 transition-all group col-span-full"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-rose-500">
+                    <ShieldAlert className="h-6 w-6" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-black text-sm text-rose-600">Report an Issue</p>
+                    <p className="text-[10px] font-bold text-rose-400 uppercase">Report scams, bugs, or vendors</p>
+                  </div>
+                </button>
+              </CardContent>
+            </Card>
+          </div>
+        );
       case "orders":
         return (
           <div className="text-center py-20 bg-white border-2 border-dashed border-slate-100 rounded-[3rem]">
@@ -291,7 +393,10 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
               ))}
             </nav>
             <div className="pt-8 px-4">
-              <button className="flex items-center gap-3 text-rose-500 font-black text-sm uppercase tracking-widest hover:underline transition-all">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-3 text-rose-500 font-black text-sm uppercase tracking-widest hover:underline transition-all"
+              >
                 <LogOut className="h-5 w-5" />
                 Sign Out
               </button>

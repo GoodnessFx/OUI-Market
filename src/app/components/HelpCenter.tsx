@@ -126,14 +126,38 @@ export function HelpCenter() {
               </h2>
               <div className="space-y-4">
                 {[
-                  { q: "Is OUI Market limited to only OUI students?", a: "While our focus is the OUI community, local vendors near campus can also register. However, 'Verified Student' tags are strictly for OUI students." },
-                  { q: "What happens if a vendor doesn't deliver?", a: "For gig-based services, your payment is protected by escrow. For physical items, we recommend public meetings. You can always report a vendor using the 'Report Issue' link." },
-                  { q: "How do I become a 'Verified Vendor'?", a: "Submit your student ID or business registration in the Vendor Portal. Our team reviews all applications within 24-48 hours." }
+                  { 
+                    q: "How does the Escrow system work?", 
+                    a: "When you pay for a service (Gig), the money is held by OUI Market's secure smart contract. The vendor is notified to start work. Once the work is delivered and you click 'Confirm Delivery', the funds are released to the vendor. This ensures both parties are protected." 
+                  },
+                  { 
+                    q: "What should I do if I get scammed?", 
+                    a: "Immediately go to your Settings > Report an Issue and select 'Report a Scam'. Provide order details and screenshots. Our security team will freeze the vendor's account and investigate. If you used Escrow, your funds are safe and can be refunded." 
+                  },
+                  { 
+                    q: "How can I withdraw my earnings?", 
+                    a: "Go to your Wallet dashboard and click 'Withdraw Funds'. You can withdraw to any Nigerian bank account or your crypto wallet. Standard bank transfers take 2-12 hours to process." 
+                  },
+                  { 
+                    q: "Is my personal data safe?", 
+                    a: "Yes. We use industry-standard SSL encryption and PCI DSS compliant payment processors (Flutterwave/Paystack). We never store your full card details on our servers." 
+                  },
+                  { 
+                    q: "Can I sell items if I'm not a student?", 
+                    a: "Yes, local vendors around OUI can sell, but they will not have the 'Verified Student' badge. They must undergo a stricter identity verification process involving business registration or government ID." 
+                  },
+                  { 
+                    q: "How do I increase my Trust Score?", 
+                    a: "Trust scores are calculated based on successful deliveries, fast response times, and positive student reviews. Keeping a high trust score gives you priority in search results." 
+                  }
                 ].map((faq, idx) => (
-                  <Card key={idx} className="border-2 border-slate-100 rounded-3xl">
-                    <CardContent className="p-6">
-                      <h4 className="font-black text-[#0F172A] mb-2">{faq.q}</h4>
-                      <p className="text-sm text-slate-500 font-medium">{faq.a}</p>
+                  <Card key={idx} className="border-2 border-slate-100 rounded-3xl hover:border-primary/20 transition-all">
+                    <CardContent className="p-8">
+                      <h4 className="font-black text-lg text-[#0F172A] mb-4 flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        {faq.q}
+                      </h4>
+                      <p className="text-sm text-slate-500 font-medium leading-relaxed pl-5 border-l-2 border-slate-100">{faq.a}</p>
                     </CardContent>
                   </Card>
                 ))}

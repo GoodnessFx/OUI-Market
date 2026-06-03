@@ -6,22 +6,23 @@ import { useStore } from "./utils/store";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
-  const { user, notifications, markNotificationRead, markAllNotificationsRead, setSupportOpen } = useStore();
+  const { user, notifications, markNotificationRead, markAllNotificationsRead, setSupportOpen, logout } = useStore();
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const accountMenuRef = useRef<HTMLDivElement>(null);
-  const helpMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    logout();
+    window.location.hash = "#/";
+    setShowAccountMenu(false);
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
         setShowAccountMenu(false);
-      }
-      if (helpMenuRef.current && !helpMenuRef.current.contains(event.target as Node)) {
-        setShowHelpMenu(false);
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
@@ -43,41 +44,10 @@ export function Header() {
               {/* Top links removed as per user request for professional look */}
             </div>
             <div className="flex items-center gap-4">
-              <div className="relative" ref={helpMenuRef}>
-                <button
-                  onClick={() => {
-                    setShowHelpMenu(!showHelpMenu);
-                    setShowAccountMenu(false);
-                    setShowNotifications(false);
-                  }}
-                  className="flex items-center gap-1.5 text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  <span>Help</span>
-                  <ChevronDown className={`h-3 w-3 transition-transform ${showHelpMenu ? 'rotate-180' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {showHelpMenu && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 py-3 z-50"
-                    >
-                      <a href="#/help" className="block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Help Center</a>
-                      <button onClick={() => { setSupportOpen(true); setShowHelpMenu(false); }} className="w-full text-left block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Contact Us</button>
-                      <a href="#/help#faq" className="block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">FAQs</a>
-                      <div className="border-t border-slate-50 my-2"></div>
-                      <a href="#/report" className="block px-5 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors">Report Issue</a>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
               <div className="relative" ref={accountMenuRef}>
                 <button
                   onClick={() => {
                     setShowAccountMenu(!showAccountMenu);
-                    setShowHelpMenu(false);
                     setShowNotifications(false);
                   }}
                   className="flex items-center gap-1.5 text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
@@ -141,7 +111,10 @@ export function Header() {
                         </a>
                       </div>
                       <div className="p-6 border-t border-slate-50 bg-slate-50/50">
-                        <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-rose-500 hover:bg-rose-500 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm hover:shadow-rose-200">
+                        <button 
+                          onClick={handleLogout}
+                          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-rose-500 hover:bg-rose-500 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm hover:shadow-rose-200"
+                        >
                           <LogOut className="h-4 w-4" />
                           Logout Account
                         </button>

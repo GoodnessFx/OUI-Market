@@ -19,6 +19,7 @@ import { ChatSystem } from "./components/ChatSystem";
 import { ProductListing } from "./components/ProductListing";
 import { HelpCenter } from "./components/HelpCenter";
 import { UserDashboard } from "./components/UserDashboard";
+import { ReportIssue } from "./components/ReportIssue";
 import { useState, useEffect } from "react";
 import { useStore } from "./components/utils/store";
 
@@ -59,6 +60,8 @@ export default function App() {
         return <ChatSystem />;
       case "#/help":
         return <HelpCenter />;
+      case "#/report":
+        return <ReportIssue />;
       case "#/account":
         return <UserDashboard view="profile" />;
       case "#/notifications":
