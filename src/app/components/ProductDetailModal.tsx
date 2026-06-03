@@ -186,7 +186,7 @@ export function ProductDetailModal({ product, isOpen, onClose }: { product: Prod
               </div>
             </div>
           </div>
-        </div></DialogContent>
+        </DialogContent>
       </Dialog>
 
       <PaymentModal 
