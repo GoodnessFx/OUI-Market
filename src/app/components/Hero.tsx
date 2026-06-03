@@ -97,63 +97,20 @@ export function Hero() {
 
           {/* Visual Content - Figma Style Showcase */}
           <div className="lg:col-span-7 relative">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1 }}
-              className="relative aspect-[4/3] md:aspect-[16/10] rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] border-[12px] border-white"
-            >
-              <AnimatePresence mode="wait">
+            <div className="relative aspect-[4/3] md:aspect-[16/10] rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] border-[12px] border-white bg-slate-100">
+              {images.map((img, idx) => (
                 <motion.div
-                  key={currentImage}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 1, ease: "circOut" }}
+                  key={img}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: currentImage === idx ? 1 : 0 }}
+                  transition={{ duration: 0.4, ease: "linear" }}
                   className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url('${images[currentImage]}')` }}
+                  style={{ backgroundImage: `url('${img}')` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
                 </motion.div>
-              </AnimatePresence>
-
-              {/* Floating UI Card 1 */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-8 right-8 bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-2xl border border-white/20 hidden md:block"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-primary/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">New Listing</p>
-                    <p className="text-sm font-black text-[#0F172A]">iPhone 15 Pro Max</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Floating UI Card 2 */}
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute bottom-8 left-8 bg-[#0F172A]/90 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border border-white/10 hidden md:block"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full border-2 border-primary overflow-hidden">
-                    <img src="https://i.pravatar.cc/100?u=oui" alt="Vendor" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-black text-white">OUI Tech Society</p>
-                    <div className="flex items-center gap-1">
-                      <div className="h-2 w-2 rounded-full bg-green-500" />
-                      <p className="text-[10px] font-bold text-white/60">Verified Vendor</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
+              ))}
+            </div>
 
             {/* Decorative Background Elements */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px] -z-10" />

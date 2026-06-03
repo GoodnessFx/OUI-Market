@@ -6,7 +6,7 @@ import { useStore } from "./utils/store";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
-  const { user, notifications, markNotificationRead, setSupportOpen } = useStore();
+  const { user, notifications, markNotificationRead, markAllNotificationsRead, setSupportOpen } = useStore();
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -108,8 +108,10 @@ export function Header() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 px-4 py-1.5 bg-primary/20 border border-primary/30 rounded-full w-fit relative z-10">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Verified Student</span>
+                          {user.isVendor ? <Store className="h-3.5 w-3.5 text-primary" /> : <CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                            {user.isVendor ? 'Verified Vendor' : 'Verified Student'}
+                          </span>
                         </div>
                       </div>
                       <div className="p-6 grid grid-cols-2 gap-3">
@@ -214,46 +216,68 @@ export function Header() {
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                     className="absolute right-0 top-full mt-4 w-[380px] bg-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-50"
                   >
-                    <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-                      <h3 className="text-lg font-black text-[#0F172A]">Notifications</h3>
-                      <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-widest">{unreadCount} New</span>
-                    </div>
-                    <ScrollArea className="h-[400px]">
-                      <div className="p-2 space-y-1">
-                        {notifications.length > 0 ? (
-                          notifications.map((n) => (
-                            <button 
-                              key={n.id}
-                              onClick={() => markNotificationRead(n.id)}
-                              className={`w-full text-left p-4 rounded-3xl transition-all flex items-start gap-4 ${n.read ? 'opacity-50 hover:bg-slate-50' : 'bg-slate-50 hover:bg-slate-100'}`}
-                            >
-                              <div className={`h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                                n.type === 'order' ? 'bg-orange-100 text-orange-600' : 
-                                n.type === 'message' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'
-                              }`}>
-                                {n.type === 'order' ? <Package className="h-5 w-5" /> : 
-                                 n.type === 'message' ? <MessageSquare className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <p className="font-black text-xs text-slate-900">{n.title}</p>
-                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{n.time}</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{n.message}</p>
-                              </div>
-                              {!n.read && <div className="h-2 w-2 rounded-full bg-primary mt-2" />}
-                            </button>
-                          ))
-                        ) : (
-                          <div className="py-12 text-center">
-                            <Bell className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-                            <p className="text-sm font-bold text-slate-400">All caught up!</p>
-                          </div>
-                        )}
+                      <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+                        <h3 className="text-lg font-black text-[#0F172A]">Notifications</h3>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => markAllNotificationsRead()}
+                            className="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-widest transition-colors"
+                          >
+                            Mark all read
+                          </button>
+                          <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-widest">{unreadCount} New</span>
+                        </div>
                       </div>
-                    </ScrollArea>
+                      <ScrollArea className="h-[400px] overscroll-contain">
+                        <div className="p-2 space-y-1">
+                          {notifications.length > 0 ? (
+                            notifications.map((n) => (
+                              <button 
+                                key={n.id}
+                                onClick={() => markNotificationRead(n.id)}
+                                className={`w-full text-left p-4 rounded-3xl transition-all flex items-start gap-4 ${n.read ? 'opacity-50 hover:bg-slate-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                              >
+                                <div className={`h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                                  n.type === 'order' ? 'bg-orange-100 text-orange-600' : 
+                                  n.type === 'message' ? 'bg-blue-100 text-blue-600' : 
+                                  n.type === 'sale' ? 'bg-green-100 text-green-600' :
+                                  n.type === 'payout' ? 'bg-purple-100 text-purple-600' :
+                                  'bg-slate-100 text-slate-600'
+                                }`}>
+                                  {n.type === 'order' ? <Package className="h-5 w-5" /> : 
+                                   n.type === 'message' ? <MessageSquare className="h-5 w-5" /> : 
+                                   n.type === 'sale' ? <Store className="h-5 w-5" /> :
+                                   n.type === 'payout' ? <CreditCard className="h-5 w-5" /> :
+                                   <Bell className="h-5 w-5" />}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <p className="font-black text-xs text-slate-900">{n.title}</p>
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{n.time}</span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{n.message}</p>
+                                </div>
+                                {!n.read && <div className="h-2 w-2 rounded-full bg-primary mt-2" />}
+                              </button>
+                            ))
+                          ) : (
+                            <div className="py-12 text-center">
+                              <Bell className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                              <p className="text-sm font-bold text-slate-400">All caught up!</p>
+                            </div>
+                          )}
+                        </div>
+                      </ScrollArea>
                     <div className="p-4 bg-slate-50 text-center">
-                      <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">View all activity</button>
+                      <button 
+                        onClick={() => {
+                          window.location.hash = "#/notifications";
+                          setShowNotifications(false);
+                        }}
+                        className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                      >
+                        View all activity
+                      </button>
                     </div>
                   </motion.div>
                 )}

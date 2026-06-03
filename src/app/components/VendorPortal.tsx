@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, ShieldCheck, Store, Upload, UserCheck, AlertCircle, BadgeCheck } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Store, Upload, UserCheck, AlertCircle, BadgeCheck, PlusCircle, LayoutDashboard, Wallet, Boxes } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { toast } from "sonner";
+import { useStore } from "./utils/store";
 
 export function VendorPortal() {
-  const [step, setStep] = useState(1);
-  const [isVerified, setIsVerified] = useState(false);
+  const { user, setVendorStatus, addNotification } = useStore();
+  const [step, setStep] = useState(user?.isVendor ? 3 : 1);
+  const [isVerified, setIsVerified] = useState(user?.verified || false);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = (e: React.FormEvent) => {
@@ -28,11 +30,43 @@ export function VendorPortal() {
     setTimeout(() => {
       setLoading(false);
       setIsVerified(true);
+      setVendorStatus(true);
       setStep(3);
+      
+      addNotification({
+        title: "Vendor Account Activated",
+        message: "Congratulations! Your vendor account is now active and verified.",
+        time: "Just now",
+        type: "system"
+      });
+
       toast.success("Verification successful! You now have a verification tag.", {
         icon: <BadgeCheck className="h-5 w-5 text-blue-500" />,
       });
     }, 2000);
+  };
+
+  const handleWithdraw = () => {
+    toast.info("Withdrawal request initiated", {
+      description: "We are processing your request to withdraw funds to your linked bank account.",
+    });
+    
+    setTimeout(() => {
+      addNotification({
+        title: "Withdrawal Successful",
+        message: "Your withdrawal of ₦0.00 has been processed successfully.",
+        time: "Just now",
+        type: "payout"
+      });
+    }, 3000);
+  };
+
+  const handleListProduct = () => {
+    toast.success("Redirecting to product listing page...");
+  };
+
+  const handleManageInventory = () => {
+    toast.success("Opening inventory manager...");
   };
 
   return (
@@ -191,9 +225,18 @@ export function VendorPortal() {
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
-                  <Button className="h-14 px-8 bg-primary font-black text-lg rounded-2xl shadow-xl">List New Product</Button>
-                  <Button variant="outline" className="h-14 px-8 border-2 font-black text-lg rounded-2xl">Manage Inventory</Button>
-                  <Button variant="secondary" className="h-14 px-8 font-black text-lg rounded-2xl">Withdraw Funds</Button>
+                  <Button onClick={handleListProduct} className="h-14 px-8 bg-primary font-black text-lg rounded-2xl shadow-xl flex items-center gap-2">
+                    <PlusCircle className="h-5 w-5" />
+                    List New Product
+                  </Button>
+                  <Button onClick={handleManageInventory} variant="outline" className="h-14 px-8 border-2 font-black text-lg rounded-2xl flex items-center gap-2">
+                    <Boxes className="h-5 w-5" />
+                    Manage Inventory
+                  </Button>
+                  <Button onClick={handleWithdraw} variant="secondary" className="h-14 px-8 font-black text-lg rounded-2xl flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white border-none shadow-lg shadow-amber-200">
+                    <Wallet className="h-5 w-5" />
+                    Withdraw Funds
+                  </Button>
                 </div>
               </div>
             </Card>

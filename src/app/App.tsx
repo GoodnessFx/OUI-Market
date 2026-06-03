@@ -61,6 +61,8 @@ export default function App() {
         return <HelpCenter />;
       case "#/account":
         return <UserDashboard view="profile" />;
+      case "#/notifications":
+        return <UserDashboard view="notifications" />;
       case "#/wallet":
         return <UserDashboard view="wallet" />;
       case "#/orders":
@@ -90,7 +92,7 @@ export default function App() {
       <SplashScreen onFinish={() => setLoading(false)} />
       
       {!loading && (
-        <div className="min-h-screen flex flex-col bg-white animate-in fade-in duration-700">
+        <div className="min-h-screen flex flex-col bg-white animate-in fade-in duration-300">
           <Header />
           <main className="flex-1">
             {renderContent()}

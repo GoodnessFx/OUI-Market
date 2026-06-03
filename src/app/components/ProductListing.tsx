@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, BadgeCheck, ShoppingCart, Filter, Search, ArrowLeft, Grid, List, CreditCard } from "lucide-react";
+import { Star, BadgeCheck, ShoppingCart, Filter, Search, ArrowLeft, Grid, List, CreditCard, Eye } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
-import { PaymentModal } from "./PaymentModal";
+import { ProductDetailModal } from "./ProductDetailModal";
 
 const ALL_PRODUCTS = [
   {
@@ -102,7 +102,7 @@ export function ProductListing({ category = "All" }: { category?: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const filteredProducts = ALL_PRODUCTS.filter(p => {
     const matchesCategory = category === "All" || p.category.toLowerCase() === category.toLowerCase();
@@ -111,9 +111,9 @@ export function ProductListing({ category = "All" }: { category?: string }) {
     return matchesCategory && matchesSearch;
   });
 
-  const handleBuyNow = (product: any) => {
+  const handleOpenDetail = (product: any) => {
     setSelectedProduct(product);
-    setIsPaymentOpen(true);
+    setIsDetailOpen(true);
   };
 
   return (
@@ -211,7 +211,8 @@ export function ProductListing({ category = "All" }: { category?: string }) {
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`group bg-white border-2 border-slate-100 rounded-[2rem] overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${
+                    onClick={() => handleOpenDetail(product)}
+                    className={`group cursor-pointer bg-white border-2 border-slate-100 rounded-[2rem] overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${
                       viewMode === "list" ? "flex flex-col md:flex-row md:items-center" : ""
                     }`}
                   >
@@ -225,6 +226,9 @@ export function ProductListing({ category = "All" }: { category?: string }) {
                         <Badge className="bg-white/90 backdrop-blur-md text-[#0F172A] border-none font-black text-[10px] px-3 py-1 shadow-lg uppercase tracking-widest">
                           {product.category}
                         </Badge>
+                      </div>
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Eye className="h-6 w-6 text-white" />
                       </div>
                     </div>
 
@@ -248,11 +252,10 @@ export function ProductListing({ category = "All" }: { category?: string }) {
                       </div>
 
                       <Button 
-                        onClick={() => handleBuyNow(product)}
                         className="w-full h-12 bg-[#0F172A] hover:bg-primary text-white font-black rounded-2xl shadow-lg transition-all group-hover:scale-[1.02] active:scale-95"
                       >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Buy Now
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Quick Buy
                       </Button>
                     </div>
                   </motion.div>
@@ -272,11 +275,10 @@ export function ProductListing({ category = "All" }: { category?: string }) {
       </div>
 
       {selectedProduct && (
-        <PaymentModal
-          isOpen={isPaymentOpen}
-          onClose={() => setIsPaymentOpen(false)}
-          amount={`₦${selectedProduct.price.toLocaleString()}`}
-          itemName={selectedProduct.name}
+        <ProductDetailModal 
+          product={{...selectedProduct, reviews: 0, inStock: true}}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
         />
       )}
     </div>

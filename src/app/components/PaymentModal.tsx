@@ -7,9 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { toast } from "sonner";
 
+import { useStore } from "./utils/store";
+
 type PaymentMethod = "naira" | "crypto" | "escrow";
 
 export function PaymentModal({ isOpen, onClose, amount, itemName }: { isOpen: boolean, onClose: () => void, amount: string, itemName: string }) {
+  const { addNotification } = useStore();
   const [method, setMethod] = useState<PaymentMethod>("naira");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -19,6 +22,14 @@ export function PaymentModal({ isOpen, onClose, amount, itemName }: { isOpen: bo
     setTimeout(() => {
       setLoading(false);
       setStep(2);
+      
+      addNotification({
+        title: "Purchase Successful",
+        message: `You have successfully purchased ${itemName} for ${amount}.`,
+        time: "Just now",
+        type: "order"
+      });
+
       toast.success("Payment successful!", {
         description: method === "escrow" ? "Funds are now locked in Smart Contract Escrow." : "Your order is being processed.",
       });

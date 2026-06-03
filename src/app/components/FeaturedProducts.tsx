@@ -1,7 +1,7 @@
-import { Star, BadgeCheck, ShoppingCart, CreditCard } from "lucide-react";
+import { Star, BadgeCheck, ShoppingCart, CreditCard, Eye } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
-import { PaymentModal } from "./PaymentModal";
+import { ProductDetailModal } from "./ProductDetailModal";
 
 const products = [
   {
@@ -84,11 +84,11 @@ const products = [
 
 export function FeaturedProducts() {
   const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  const handleBuyNow = (product: typeof products[0]) => {
+  const handleOpenDetail = (product: typeof products[0]) => {
     setSelectedProduct(product);
-    setIsPaymentOpen(true);
+    setIsDetailOpen(true);
   };
 
   return (
@@ -99,82 +99,73 @@ export function FeaturedProducts() {
             <h2 className="text-3xl font-black tracking-tight">
               Featured <span className="text-primary">Campus Deals</span>
             </h2>
-            <p className="text-sm text-muted-foreground font-bold mt-1">Best selling products from verified student vendors</p>
+            <p className="text-slate-500 font-medium">Top-rated items from verified campus vendors</p>
           </div>
-          <button className="bg-primary/10 text-primary px-6 py-2 rounded-full text-sm font-black hover:bg-primary hover:text-white transition-all">
-            VIEW ALL PRODUCTS
-          </button>
+          <Button 
+            variant="ghost" 
+            onClick={() => window.location.hash = "#/all-products"}
+            className="font-black text-xs uppercase tracking-widest text-primary hover:bg-primary/5"
+          >
+            View All Products
+          </Button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {products.map((product) => (
-            <div
-              key={product.id}
-              className="group cursor-pointer bg-white border-2 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            <div 
+              key={product.id} 
+              className="group relative bg-white rounded-[2rem] border border-slate-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col h-full cursor-pointer"
+              onClick={() => handleOpenDetail(product)}
             >
-              <div className="relative aspect-square bg-muted/30 overflow-hidden">
-                <img
-                  src={product.image}
+              <div className="relative aspect-square overflow-hidden bg-slate-50">
+                <img 
+                  src={product.image} 
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                {product.discount && (
-                  <div className="absolute top-3 left-3 bg-secondary text-white text-[10px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-widest">
-                    -{product.discount}% OFF
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                    <Eye className="h-6 w-6 text-primary" />
                   </div>
-                )}
-                {product.inStock && (
-                  <div className="absolute bottom-3 left-3 bg-green-500 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-widest">
-                    Verified Stock
+                </div>
+                {product.discount && (
+                  <div className="absolute top-4 right-4 bg-rose-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-lg">
+                    -{product.discount}%
                   </div>
                 )}
               </div>
 
-              <div className="p-4 space-y-3">
-                <h3 className="text-sm font-black line-clamp-2 leading-snug min-h-[2.5rem] group-hover:text-primary transition-colors">
+              <div className="p-5 flex-1 flex flex-col">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[80px]">
+                    {product.vendor}
+                  </span>
+                  {product.verified && <BadgeCheck className="h-3 w-3 text-blue-500" />}
+                </div>
+                
+                <h3 className="font-bold text-sm text-[#0F172A] leading-tight mb-3 line-clamp-2 group-hover:text-primary transition-colors">
                   {product.name}
                 </h3>
 
-                <div className="space-y-1">
-                  <div className="text-xl font-black text-primary">₦{product.price.toLocaleString()}</div>
-                  {product.originalPrice && (
-                    <div className="text-xs text-muted-foreground line-through font-bold">
-                      ₦{product.originalPrice.toLocaleString()}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-1 text-[10px]">
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-3 w-3 ${
-                          i < Math.floor(product.rating)
-                            ? "fill-secondary text-secondary"
-                            : "fill-muted text-muted"
-                        }`}
-                      />
-                    ))}
+                <div className="mt-auto">
+                  <div className="flex items-center gap-1 mb-2">
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    <span className="text-[10px] font-black">{product.rating}</span>
+                    <span className="text-[9px] text-slate-400 font-bold ml-1">({product.reviews})</span>
                   </div>
-                  <span className="text-muted-foreground font-bold">({product.reviews})</span>
+                  
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-base font-black text-[#0F172A]">
+                      ₦{product.price.toLocaleString()}
+                    </span>
+                    <Button 
+                      size="icon"
+                      className="h-9 w-9 rounded-xl bg-slate-100 text-slate-900 hover:bg-primary hover:text-white transition-all shadow-sm"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-black uppercase tracking-tighter">
-                  <span className="truncate">{product.vendor}</span>
-                  {product.verified && (
-                    <BadgeCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
-                  )}
-                </div>
-
-                <Button
-                  size="sm"
-                  className="w-full mt-2 bg-primary hover:bg-primary/90 text-white font-black rounded-xl shadow-lg transition-all active:scale-95"
-                  onClick={() => handleBuyNow(product)}
-                >
-                  <CreditCard className="h-3.5 w-3.5 mr-2" />
-                  Buy Now
-                </Button>
               </div>
             </div>
           ))}
@@ -182,11 +173,10 @@ export function FeaturedProducts() {
       </div>
 
       {selectedProduct && (
-        <PaymentModal
-          isOpen={isPaymentOpen}
-          onClose={() => setIsPaymentOpen(false)}
-          amount={`₦${selectedProduct.price.toLocaleString()}`}
-          itemName={selectedProduct.name}
+        <ProductDetailModal 
+          product={selectedProduct}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
         />
       )}
     </section>

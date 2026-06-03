@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useStore } from "./utils/store";
+import { toast } from "sonner";
 
 type Message = {
   id: string;
@@ -15,47 +16,54 @@ type Message = {
 };
 
 export function SupportChat() {
-  const { isSupportOpen: isOpen, setSupportOpen: setIsOpen } = useStore();
+  const { 
+    isSupportOpen: isOpen, 
+    setSupportOpen: setIsOpen, 
+    supportMessages: messages, 
+    addSupportMessage,
+    user 
+  } = useStore();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! Welcome to OUI Market Support. How can we help you today?",
-      sender: "support",
-      timestamp: new Date(),
-    },
-  ]);
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const scrollToBottom = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
-  }, [messages, isOpen]);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isOpen, isTyping]);
 
   const handleSend = () => {
     if (!message.trim()) return;
 
-    const userMsg: Message = {
-      id: Date.now().toString(),
+    addSupportMessage({
       text: message,
-      sender: "user",
-      timestamp: new Date(),
-    };
+      sender: isAdminMode ? "support" : "user",
+      userId: user?.id || "anonymous"
+    });
 
-    setMessages((prev: Message[]) => [...prev, userMsg]);
     setMessage("");
 
-    // Simulate AI response
-    setTimeout(() => {
-      const supportMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Thanks for your message! A member of our support team (or our AI assistant) will be with you shortly. We're currently processing your request.",
-        sender: "support",
-        timestamp: new Date(),
-      };
-      setMessages((prev: Message[]) => [...prev, supportMsg]);
-    }, 1500);
+    if (!isAdminMode) {
+      setIsTyping(true);
+      // Simulate AI response if not in admin mode
+      setTimeout(() => {
+        addSupportMessage({
+          text: "Thanks for your message! Our support team has been notified and will get back to you shortly.",
+          sender: "support",
+          userId: user?.id || "anonymous"
+        });
+        setIsTyping(false);
+      }, 1500);
+    }
   };
 
   return (
@@ -74,52 +82,84 @@ export function SupportChat() {
               <div className="flex items-center gap-4 relative z-10">
                 <div className="relative">
                   <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg border-2 border-white/10">
-                    <span className="text-xl font-black text-white">O</span>
+                    <span className="text-xl font-black text-white">{isAdminMode ? "A" : "O"}</span>
                   </div>
                   <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 border-2 border-[#0F172A] rounded-full" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm tracking-tight">OUI Support</h3>
+                  <h3 className="font-black text-sm tracking-tight">{isAdminMode ? "Admin Console" : "OUI Support"}</h3>
                   <div className="flex items-center gap-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                    <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">AI Assistant Online</p>
+                    <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">
+                      {isAdminMode ? "Replying as Support" : "AI Assistant Online"}
+                    </p>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-white/10 rounded-xl transition-colors relative z-10"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-2 relative z-10">
+                {user?.isAdmin && (
+                  <button
+                    onClick={() => {
+                      setIsAdminMode(!isAdminMode);
+                      toast.info(isAdminMode ? "Switched to User Mode" : "Switched to Admin Mode", {
+                        description: isAdminMode ? "You are now chatting as a customer." : "You are now replying as OUI Support.",
+                      });
+                    }}
+                    className={`text-[9px] font-black px-3 py-1.5 rounded-full border transition-all duration-300 ${
+                      isAdminMode 
+                        ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(var(--primary),0.5)] scale-105" 
+                        : "bg-white/10 border-white/20 text-white/60 hover:bg-white/20"
+                    }`}
+                  >
+                    {isAdminMode ? "ADMIN ACTIVE" : "GO ADMIN"}
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4" viewportRef={scrollRef}>
-              <div className="space-y-4">
+            <ScrollArea className="flex-1 px-4" viewportRef={scrollRef}>
+              <div className="py-6 space-y-6">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
                     className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl p-3 text-sm font-medium shadow-sm ${
+                      className={`max-w-[85%] rounded-[1.5rem] p-4 text-sm font-medium shadow-sm transition-all hover:shadow-md ${
                         msg.sender === "user"
-                          ? "bg-primary text-white rounded-tr-none"
-                          : "bg-muted text-foreground rounded-tl-none"
+                          ? "bg-[#0F172A] text-white rounded-tr-none"
+                          : "bg-slate-50 text-slate-900 border border-slate-100 rounded-tl-none"
                       }`}
                     >
                       {msg.text}
                       <p
-                        className={`text-[10px] mt-1 ${
-                          msg.sender === "user" ? "text-white/60 text-right" : "text-muted-foreground"
+                        className={`text-[9px] mt-2 font-black uppercase tracking-widest ${
+                          msg.sender === "user" ? "text-white/40 text-right" : "text-slate-400"
                         }`}
                       >
-                        {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
                 ))}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="bg-slate-50 border border-slate-100 rounded-[1.5rem] rounded-tl-none p-4 shadow-sm">
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+                        <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.2s]" />
+                        <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.4s]" />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </ScrollArea>
 

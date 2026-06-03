@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut } from "lucide-react";
+import { User, Package, CreditCard, Settings, Copy, Share2, TrendingUp, Wallet, ArrowRight, History, Gift, CheckCircle2, LogOut, Bell, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -8,10 +8,21 @@ import { useStore } from "./utils/store";
 import { toast } from "sonner";
 
 export function UserDashboard({ view = "profile" }: { view?: string }) {
-  const { user } = useStore();
+  const { user, notifications, markNotificationRead, markAllNotificationsRead, updateBalance, addNotification } = useStore();
   const [copied, setCopied] = useState(false);
 
   if (!user) return null;
+
+  const handleSimulateReferral = () => {
+    updateBalance(500);
+    addNotification({
+      title: "Referral Bonus!",
+      message: "You just earned ₦500 from a new student referral.",
+      time: "Just now",
+      type: "order"
+    });
+    toast.success("₦500 added to your wallet!");
+  };
 
   const copyReferral = () => {
     navigator.clipboard.writeText(user.referralCode);
@@ -22,6 +33,71 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
 
   const renderView = () => {
     switch (view) {
+      case "notifications":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-4">
+              <h2 className="text-2xl font-black text-[#0F172A]">All Notifications</h2>
+              <Button 
+                variant="ghost" 
+                onClick={markAllNotificationsRead}
+                className="text-xs font-black uppercase tracking-widest text-primary hover:bg-primary/5"
+              >
+                Mark all as read
+              </Button>
+            </div>
+            <div className="grid gap-4">
+              {notifications.length > 0 ? (
+                notifications.map((n) => (
+                  <Card 
+                    key={n.id} 
+                    className={`border-2 transition-all rounded-[2rem] overflow-hidden ${n.read ? 'border-slate-50 opacity-60' : 'border-primary/10 bg-primary/5 shadow-lg shadow-primary/5'}`}
+                  >
+                    <CardContent className="p-8">
+                      <div className="flex items-start gap-6">
+                        <div className={`h-16 w-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                          n.type === 'order' ? 'bg-orange-100 text-orange-600' : 
+                          n.type === 'message' ? 'bg-blue-100 text-blue-600' : 
+                          n.type === 'sale' ? 'bg-green-100 text-green-600' :
+                          n.type === 'payout' ? 'bg-purple-100 text-purple-600' :
+                          'bg-slate-100 text-slate-600'
+                        }`}>
+                          {n.type === 'order' ? <Package className="h-8 w-8" /> : 
+                           n.type === 'message' ? <MessageSquare className="h-8 w-8" /> : 
+                           n.type === 'sale' ? <TrendingUp className="h-8 w-8" /> :
+                           n.type === 'payout' ? <CreditCard className="h-8 w-8" /> :
+                           <Bell className="h-8 w-8" />}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-black text-lg text-[#0F172A]">{n.title}</h4>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{n.time}</span>
+                          </div>
+                          <p className="text-slate-500 font-medium leading-relaxed text-sm">{n.message}</p>
+                          {!n.read && (
+                            <Button 
+                              variant="link" 
+                              onClick={() => markNotificationRead(n.id)}
+                              className="p-0 h-auto mt-4 text-xs font-black uppercase tracking-widest text-primary"
+                            >
+                              Mark as read
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-20 bg-white border-2 border-dashed border-slate-100 rounded-[3rem]">
+                  <Bell className="h-16 w-16 text-slate-200 mx-auto mb-6" />
+                  <h3 className="text-2xl font-black text-[#0F172A] mb-2">All caught up!</h3>
+                  <p className="text-slate-500 font-medium">You don't have any new notifications at the moment.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
       case "wallet":
         return (
           <div className="space-y-8">
@@ -197,6 +273,7 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
             <nav className="space-y-2">
               {[
                 { id: "profile", label: "Profile", icon: User, path: "#/account" },
+                { id: "notifications", label: "Notifications", icon: Bell, path: "#/notifications" },
                 { id: "wallet", label: "Wallet & Referral", icon: Wallet, path: "#/wallet" },
                 { id: "orders", label: "My Orders", icon: Package, path: "#/orders" },
                 { id: "settings", label: "Settings", icon: Settings, path: "#/settings" }

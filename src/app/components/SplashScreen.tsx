@@ -7,8 +7,8 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(false);
-      setTimeout(onFinish, 800); // Wait for exit animation
-    }, 3500);
+      setTimeout(onFinish, 300); // Faster finish
+    }, 2000); // Reduced total time
     return () => clearTimeout(timer);
   }, [onFinish]);
 
@@ -17,7 +17,7 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
       {show && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.8, ease: "circOut" } }}
+          exit={{ opacity: 0, transition: { duration: 0.3, ease: "linear" } }}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F172A]"
         >
           {/* Animated Background Elements */}

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { HelpCircle, BookOpen, ShieldCheck, ShoppingBag, MessageSquare, Zap, ArrowRight, CheckCircle2, Info } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
+import { useStore } from "./utils/store";
 
 const guides = [
   {
@@ -47,6 +48,8 @@ const guides = [
 ];
 
 export function HelpCenter() {
+  const setSupportOpen = useStore((state) => state.setSupportOpen);
+
   return (
     <div className="min-h-screen bg-slate-50/50">
       {/* Hero Section */}
@@ -149,10 +152,7 @@ export function HelpCenter() {
                 Our support team and AI assistant are available 24/7 to help with any issues.
               </p>
               <Button 
-                onClick={() => {
-                  const store = (window as any).useStore;
-                  if (store) store.getState().setSupportOpen(true);
-                }}
+                onClick={() => setSupportOpen(true)}
                 className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black rounded-2xl shadow-xl transition-all active:scale-95 group"
               >
                 Chat with Support

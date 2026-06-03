@@ -1,5 +1,23 @@
 import { create } from 'zustand';
 
+interface Review {
+  id: string;
+  productId: number;
+  userName: string;
+  rating: number;
+  comment: string;
+  time: string;
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+  type: 'order' | 'message' | 'system' | 'sale' | 'payout';
+}
+
 interface User {
   id: string;
   name: string;
@@ -11,26 +29,33 @@ interface User {
   referralCode: string;
   referralsCount: number;
   referralEarnings: number;
+  isAdmin?: boolean;
 }
 
-interface Notification {
+interface Message {
   id: string;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  type: 'order' | 'message' | 'system';
+  text: string;
+  sender: "user" | "support";
+  timestamp: Date;
+  userId: string;
 }
 
 interface AppState {
   user: User | null;
   notifications: Notification[];
+  reviews: Review[];
   isSupportOpen: boolean;
+  supportMessages: Message[];
   setSupportOpen: (open: boolean) => void;
   markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  addNotification: (n: Omit<Notification, 'id' | 'read'>) => void;
+  addReview: (r: Omit<Review, 'id' | 'time'>) => void;
   login: (user: User) => void;
   logout: () => void;
   updateBalance: (amount: number) => void;
+  addSupportMessage: (m: Omit<Message, 'id' | 'timestamp'>) => void;
+  setVendorStatus: (status: boolean) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -44,7 +69,8 @@ export const useStore = create<AppState>((set) => ({
     walletBalance: 12500,
     referralCode: 'OUI-ADE-2026',
     referralsCount: 8,
-    referralEarnings: 4000
+    referralEarnings: 4000,
+    isAdmin: true
   },
   notifications: [
     {
@@ -72,14 +98,77 @@ export const useStore = create<AppState>((set) => ({
       type: 'system'
     }
   ],
+  reviews: [
+    {
+      id: '1',
+      productId: 1,
+      userName: 'Sarah K.',
+      rating: 5,
+      comment: 'Best Jollof on campus! The chicken was so tender.',
+      time: '2 days ago'
+    },
+    {
+      id: '2',
+      productId: 2,
+      userName: 'James L.',
+      rating: 4,
+      comment: 'Authentic AirPods. Delivery was a bit slow though.',
+      time: '1 week ago'
+    }
+  ],
+  supportMessages: [
+    {
+      id: "1",
+      text: "Hello! Welcome to OUI Market Support. How can we help you today?",
+      sender: "support",
+      timestamp: new Date(),
+      userId: "1"
+    }
+  ],
   isSupportOpen: false,
   setSupportOpen: (open) => set({ isSupportOpen: open }),
   markNotificationRead: (id) => set((state) => ({
     notifications: state.notifications.map(n => n.id === id ? { ...n, read: true } : n)
   })),
+  markAllNotificationsRead: () => set((state) => ({
+    notifications: state.notifications.map(n => ({ ...n, read: true }))
+  })),
+  addNotification: (n) => set((state) => ({
+    notifications: [
+      {
+        ...n,
+        id: Date.now().toString(),
+        read: false
+      },
+      ...state.notifications
+    ]
+  })),
+  addReview: (r) => set((state) => ({
+    reviews: [
+      {
+        ...r,
+        id: Date.now().toString(),
+        time: 'Just now'
+      },
+      ...state.reviews
+    ]
+  })),
   login: (user) => set({ user }),
   logout: () => set({ user: null }),
   updateBalance: (amount) => set((state) => ({
     user: state.user ? { ...state.user, walletBalance: state.user.walletBalance + amount } : null
+  })),
+  addSupportMessage: (m) => set((state) => ({
+    supportMessages: [
+      ...state.supportMessages,
+      {
+        ...m,
+        id: Date.now().toString(),
+        timestamp: new Date()
+      }
+    ]
+  })),
+  setVendorStatus: (status) => set((state) => ({
+    user: state.user ? { ...state.user, isVendor: status } : null
   }))
 }));
