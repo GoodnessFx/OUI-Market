@@ -179,6 +179,7 @@ export function ProductDetailModal({ product, isOpen, onClose }: { product: Prod
                 </Button>
                 <Button 
                   variant="outline"
+                  onClick={() => toast.success("Added to cart!")}
                   className="h-14 w-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center hover:bg-slate-50 transition-all"
                 >
                   <ShoppingCart className="h-6 w-6 text-slate-600" />

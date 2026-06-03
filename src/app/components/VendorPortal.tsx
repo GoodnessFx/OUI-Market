@@ -83,7 +83,7 @@ export function VendorPortal() {
           </motion.div>
           <h1 className="text-4xl md:text-6xl font-black mb-4">Grow Your Business on OUI Market</h1>
           <p className="text-muted-foreground text-lg font-medium max-w-2xl mx-auto">
-            Join 200+ verified student and local vendors. Get discovered, sell safely, and build your brand.
+            Join 30+ verified student and local vendors. Get discovered, sell safely, and build your brand.
           </p>
         </div>
 

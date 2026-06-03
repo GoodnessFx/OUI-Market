@@ -1,9 +1,10 @@
-import { Search, ShoppingCart, Bell, User, Menu, HelpCircle, ChevronDown, Package, Heart, Settings, LogOut, CreditCard, MapPin, CheckCircle2, MessageSquare } from "lucide-react";
+import { Search, ShoppingCart, Bell, User, Menu, HelpCircle, ChevronDown, Package, Heart, Settings, LogOut, CreditCard, MapPin, CheckCircle2, MessageSquare, Store } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "./utils/store";
 import { motion, AnimatePresence } from "framer-motion";
+import { ScrollArea } from "./ui/scroll-area";
 
 export function Header() {
   const { user, notifications, markNotificationRead, markAllNotificationsRead, setSupportOpen, logout } = useStore();
@@ -171,7 +172,6 @@ export function Header() {
                 onClick={() => {
                   setShowNotifications(!showNotifications);
                   setShowAccountMenu(false);
-                  setShowHelpMenu(false);
                 }}
               >
                 <Bell className="h-6 w-6" />

@@ -84,12 +84,12 @@ export function Hero() {
               className="flex items-center gap-8 pt-8 border-t border-slate-100"
             >
               <div>
-                <p className="text-2xl font-black text-[#0F172A]">2.5k+</p>
+                <p className="text-2xl font-black text-[#0F172A]">100+</p>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Students</p>
               </div>
               <div className="w-px h-8 bg-slate-100" />
               <div>
-                <p className="text-2xl font-black text-[#0F172A]">200+</p>
+                <p className="text-2xl font-black text-[#0F172A]">30+</p>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Verified Shops</p>
               </div>
             </motion.div>
