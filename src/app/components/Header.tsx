@@ -1,14 +1,19 @@
-import { Search, ShoppingCart, Bell, User, Menu, HelpCircle, ChevronDown, Package, Heart, Settings, LogOut, CreditCard, MapPin } from "lucide-react";
+import { Search, ShoppingCart, Bell, User, Menu, HelpCircle, ChevronDown, Package, Heart, Settings, LogOut, CreditCard, MapPin, CheckCircle2, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useState, useEffect, useRef } from "react";
+import { useStore } from "./utils/store";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
+  const { user, notifications, markNotificationRead, setSupportOpen } = useStore();
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showHelpMenu, setShowHelpMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const helpMenuRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -18,21 +23,33 @@ export function Header() {
       if (helpMenuRef.current && !helpMenuRef.current.contains(event.target as Node)) {
         setShowHelpMenu(false);
       }
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      <div className="bg-muted/30 border-b border-border/50">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
+      <div className="bg-slate-50 border-b border-slate-100">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-9 text-xs">
-            <div className="flex items-center gap-4">
-              <a href="#/vendor" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+          <div className="flex items-center justify-between h-10 text-xs">
+            <div className="flex items-center gap-6">
+              <a href="#/vendor" className="text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider">
                 Sell on OUIMarket
               </a>
+              <div className="h-3 w-px bg-slate-200" />
+              <button 
+                onClick={() => setSupportOpen(true)}
+                className="text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
+              >
+                Contact Support
+              </button>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative" ref={helpMenuRef}>
@@ -40,76 +57,102 @@ export function Header() {
                   onClick={() => {
                     setShowHelpMenu(!showHelpMenu);
                     setShowAccountMenu(false);
+                    setShowNotifications(false);
                   }}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                  className="flex items-center gap-1.5 text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
                 >
                   <HelpCircle className="h-3.5 w-3.5" />
                   <span>Help</span>
                   <ChevronDown className={`h-3 w-3 transition-transform ${showHelpMenu ? 'rotate-180' : ''}`} />
                 </button>
-                {showHelpMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-xl border py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                    <a href="#help" className="block px-4 py-2 text-sm hover:bg-muted/50 transition-colors">Help Center</a>
-                    <a href="#contact" className="block px-4 py-2 text-sm hover:bg-muted/50 transition-colors">Contact Us</a>
-                    <a href="#faq" className="block px-4 py-2 text-sm hover:bg-muted/50 transition-colors">FAQs</a>
-                    <a href="#track" className="block px-4 py-2 text-sm hover:bg-muted/50 transition-colors">Track Order</a>
-                    <div className="border-t my-2"></div>
-                    <a href="#report" className="block px-4 py-2 text-sm text-destructive hover:bg-destructive/5 transition-colors">Report Issue</a>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {showHelpMenu && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 py-3 z-50"
+                    >
+                      <a href="#/help" className="block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Help Center</a>
+                      <button onClick={() => { setSupportOpen(true); setShowHelpMenu(false); }} className="w-full text-left block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Contact Us</button>
+                      <a href="#/help#faq" className="block px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">FAQs</a>
+                      <div className="border-t border-slate-50 my-2"></div>
+                      <a href="#/report" className="block px-5 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors">Report Issue</a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className="relative" ref={accountMenuRef}>
                 <button
                   onClick={() => {
                     setShowAccountMenu(!showAccountMenu);
                     setShowHelpMenu(false);
+                    setShowNotifications(false);
                   }}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                  className="flex items-center gap-1.5 text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider"
                 >
                   <User className="h-3.5 w-3.5" />
-                  <span>Account</span>
+                  <span>{user ? user.name : 'Account'}</span>
                   <ChevronDown className={`h-3 w-3 transition-transform ${showAccountMenu ? 'rotate-180' : ''}`} />
                 </button>
-                {showAccountMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                    <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-4 py-3 border-b">
-                      <p className="font-bold text-sm">Welcome back!</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">adebayo.m@oduduwa.edu.ng</p>
-                    </div>
-                    <div className="py-2">
-                      <a href="#account" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <User className="h-4 w-4 text-primary" />
-                        <span>My Account</span>
-                      </a>
-                      <a href="#orders" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <Package className="h-4 w-4 text-primary" />
-                        <span>Orders</span>
-                      </a>
-                      <a href="#wishlist" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <Heart className="h-4 w-4 text-primary" />
-                        <span>Saved Items</span>
-                      </a>
-                      <a href="#wallet" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <CreditCard className="h-4 w-4 text-primary" />
-                        <span>Wallet</span>
-                      </a>
-                      <a href="#addresses" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span>Addresses</span>
-                      </a>
-                      <a href="#settings" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/5 transition-colors">
-                        <Settings className="h-4 w-4 text-primary" />
-                        <span>Settings</span>
-                      </a>
-                    </div>
-                    <div className="border-t py-2">
-                      <button className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/5 transition-colors w-full font-semibold">
-                        <LogOut className="h-4 w-4" />
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {showAccountMenu && user && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 top-full mt-2 w-72 bg-white rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50"
+                    >
+                      <div className="bg-slate-900 p-6 text-white">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-xl font-black shadow-lg">
+                            {user.name[0]}
+                          </div>
+                          <div>
+                            <p className="font-black text-sm">{user.name}</p>
+                            <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{user.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full w-fit">
+                          <CheckCircle2 className="h-3 w-3 text-primary" />
+                          <span className="text-[9px] font-black uppercase tracking-widest">Verified Student</span>
+                        </div>
+                      </div>
+                      <div className="p-4 grid grid-cols-2 gap-2">
+                        <a href="#/account" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
+                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <User className="h-5 w-5" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Profile</span>
+                        </a>
+                        <a href="#/orders" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
+                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <Package className="h-5 w-5" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Orders</span>
+                        </a>
+                        <a href="#/wallet" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
+                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <CreditCard className="h-5 w-5" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Wallet</span>
+                        </a>
+                        <a href="#/settings" className="flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 transition-all group">
+                          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            <Settings className="h-5 w-5" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Settings</span>
+                        </a>
+                      </div>
+                      <div className="p-4 border-t border-slate-50">
+                        <button className="w-full flex items-center justify-center gap-3 py-3 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors font-black text-xs uppercase tracking-widest">
+                          <LogOut className="h-4 w-4" />
+                          Logout Account
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -117,9 +160,9 @@ export function Header() {
       </div>
 
       <div className="container mx-auto">
-        <div className="flex h-16 items-center gap-4 px-4">
-          <button className="lg:hidden">
-            <Menu className="h-6 w-6" />
+        <div className="flex h-20 items-center gap-8 px-4">
+          <button className="lg:hidden text-slate-900">
+            <Menu className="h-7 w-7" />
           </button>
 
           <a href="#/" className="flex items-center gap-3 flex-shrink-0 group">
@@ -132,55 +175,100 @@ export function Header() {
             </div>
           </a>
 
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 max-w-2xl hidden md:block">
             <form className="relative" onSubmit={(e) => e.preventDefault()}>
               <Input
                 type="search"
-                placeholder="Search products, services & more"
+                placeholder="Search for textbooks, hostels, electronics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-4 pr-12 h-10 bg-muted/50 border focus-visible:ring-primary transition-all"
+                className="w-full pl-6 pr-14 h-12 bg-slate-100 border-none rounded-2xl focus-visible:ring-primary/20 transition-all font-medium text-slate-900"
               />
               <Button
                 size="sm"
-                className="absolute right-0 top-0 h-10 px-6 rounded-l-none bg-primary hover:bg-primary/90 transition-all active:scale-95"
+                className="absolute right-1 top-1 h-10 w-12 rounded-xl bg-[#0F172A] hover:bg-black transition-all active:scale-95"
               >
                 <Search className="h-4 w-4" />
               </Button>
             </form>
           </div>
 
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden lg:flex items-center gap-2 hover:bg-primary/5 transition-all"
-              onClick={() => setShowAccountMenu(!showAccountMenu)}
-            >
-              <User className="h-4 w-4" />
-              <span>Account</span>
-            </Button>
+          <div className="flex items-center gap-3">
+            <div className="relative" ref={notificationRef}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`relative h-12 w-12 rounded-2xl transition-all ${showNotifications ? 'bg-primary/10 text-primary' : 'hover:bg-slate-100 text-slate-600'}`}
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  setShowAccountMenu(false);
+                  setShowHelpMenu(false);
+                }}
+              >
+                <Bell className="h-6 w-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-2.5 right-2.5 h-4 w-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-4 w-[380px] bg-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-50"
+                  >
+                    <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+                      <h3 className="text-lg font-black text-[#0F172A]">Notifications</h3>
+                      <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-widest">{unreadCount} New</span>
+                    </div>
+                    <ScrollArea className="h-[400px]">
+                      <div className="p-2 space-y-1">
+                        {notifications.length > 0 ? (
+                          notifications.map((n) => (
+                            <button 
+                              key={n.id}
+                              onClick={() => markNotificationRead(n.id)}
+                              className={`w-full text-left p-4 rounded-3xl transition-all flex items-start gap-4 ${n.read ? 'opacity-50 hover:bg-slate-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                            >
+                              <div className={`h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                                n.type === 'order' ? 'bg-orange-100 text-orange-600' : 
+                                n.type === 'message' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'
+                              }`}>
+                                {n.type === 'order' ? <Package className="h-5 w-5" /> : 
+                                 n.type === 'message' ? <MessageSquare className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="font-black text-xs text-slate-900">{n.title}</p>
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{n.time}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{n.message}</p>
+                              </div>
+                              {!n.read && <div className="h-2 w-2 rounded-full bg-primary mt-2" />}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="py-12 text-center">
+                            <Bell className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                            <p className="text-sm font-bold text-slate-400">All caught up!</p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                    <div className="p-4 bg-slate-50 text-center">
+                      <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">View all activity</button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden lg:flex items-center gap-2 hover:bg-primary/5 transition-all"
-              onClick={() => setShowHelpMenu(!showHelpMenu)}
-            >
-              <HelpCircle className="h-4 w-4" />
-              <span>Help</span>
-            </Button>
-
-            <Button variant="ghost" size="icon" className="relative hover:bg-primary/5 transition-all">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-secondary text-white text-[10px] font-semibold flex items-center justify-center animate-pulse">
-                3
-              </span>
-            </Button>
-
-            <Button variant="ghost" size="icon" className="relative hover:bg-primary/5 transition-all">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-secondary text-white text-[10px] font-semibold flex items-center justify-center">
+            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-slate-100 text-slate-600 relative">
+              <ShoppingCart className="h-6 w-6" />
+              <span className="absolute top-2.5 right-2.5 h-4 w-4 rounded-full bg-[#0F172A] text-white text-[9px] font-black flex items-center justify-center ring-2 ring-white">
                 2
               </span>
             </Button>
@@ -188,17 +276,17 @@ export function Header() {
         </div>
       </div>
 
-      <div className="border-t bg-white hidden md:block">
+      <div className="border-t bg-white hidden md:block border-slate-100">
         <div className="container mx-auto px-4">
-          <div className="flex items-center h-10 text-sm font-medium">
-            <a href="#/all-products" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">All Categories</a>
-            <a href="#/products/food" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Food & Drinks</a>
-            <a href="#/products/fashion" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Fashion</a>
-            <a href="#/products/electronics" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Electronics</a>
-            <a href="#/products/services" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Services</a>
-            <a href="#/housing" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Housing</a>
-            <a href="#/jobs" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Jobs</a>
-            <a href="#/chat" className="px-3 py-2 text-slate-600 hover:text-primary transition-all font-bold">Messages</a>
+          <div className="flex items-center h-12 text-[11px] font-black uppercase tracking-[0.15em]">
+            <a href="#/all-products" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">All Categories</a>
+            <a href="#/products/food" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Food & Drinks</a>
+            <a href="#/products/fashion" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Fashion</a>
+            <a href="#/products/electronics" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Electronics</a>
+            <a href="#/products/services" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Services</a>
+            <a href="#/housing" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Housing</a>
+            <a href="#/jobs" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Jobs</a>
+            <a href="#/chat" className="px-4 py-2 text-slate-500 hover:text-primary transition-all">Messages</a>
           </div>
         </div>
       </div>

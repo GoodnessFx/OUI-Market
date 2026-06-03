@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useStore } from "./utils/store";
 
 type Message = {
   id: string;
@@ -14,7 +15,7 @@ type Message = {
 };
 
 export function SupportChat() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isSupportOpen: isOpen, setSupportOpen: setIsOpen } = useStore();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {

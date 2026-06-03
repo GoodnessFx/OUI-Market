@@ -18,11 +18,19 @@ import { JobMarketplace } from "./components/JobMarketplace";
 import { ChatSystem } from "./components/ChatSystem";
 import { ProductListing } from "./components/ProductListing";
 import { WhatsAppButton } from "./components/WhatsAppButton";
+import { HelpCenter } from "./components/HelpCenter";
 import { useState, useEffect } from "react";
+import { useStore } from "./components/utils/store";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentPath, setCurrentPath] = useState(window.location.hash || "#/");
+  const setSupportOpen = useStore((state) => state.setSupportOpen);
+
+  // Expose store to window for global access (needed for HelpCenter)
+  useEffect(() => {
+    (window as any).useStore = { getState: () => ({ setSupportOpen }) };
+  }, [setSupportOpen]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -49,6 +57,8 @@ export default function App() {
         return <JobMarketplace />;
       case "#/chat":
         return <ChatSystem />;
+      case "#/help":
+        return <HelpCenter />;
       default:
         return (
           <>
