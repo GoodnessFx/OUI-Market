@@ -57,8 +57,6 @@ export default function App() {
         return <VendorPortal />;
       case "#/tasks":
         return <TaskMarketplace />;
-      case "#/help":
-        return <JobMarketplace />;
       case "#/chat":
         return <ChatSystem />;
       case "#/help":

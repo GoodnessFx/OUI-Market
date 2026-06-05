@@ -37,7 +37,7 @@ export function PaymentModal({ isOpen, onClose, amount, itemName }: { isOpen: bo
   };
 
   const copyAddress = () => {
-    navigator.clipboard.writeText("0x71C7656EC7ab88b098defB751B7401B5f6d8976F");
+    navigator.clipboard.writeText("0x0000000000000000000000000000000000000000"); // Use .env or dynamic address in production
     toast.success("Address copied!");
   };
 
