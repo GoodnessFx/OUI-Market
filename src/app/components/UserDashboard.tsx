@@ -66,8 +66,8 @@ export function UserDashboard({ view = "profile" }: { view?: string }) {
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 { label: "Wallet Balance", value: `₦${user.walletBalance.toLocaleString()}`, icon: Wallet, color: "text-emerald-500", bg: "bg-emerald-50" },
-                { label: "Total Orders", value: "12", icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
-                { label: "Trust Score", value: "98%", icon: ShieldCheck, color: "text-amber-500", bg: "bg-amber-50" }
+                { label: "Smart Wallet", value: "Active", icon: ShieldCheck, color: "text-blue-500", bg: "bg-blue-50" },
+                { label: "OUI Score", value: "720", icon: Star, color: "text-amber-500", bg: "bg-amber-50" }
               ].map((stat, i) => (
                 <div key={i} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
                   <div className={`h-12 w-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center`}>

@@ -1,108 +1,42 @@
-# OUI MARKET - The Ultimate University Marketplace 🎓🛒
+# OUI Market — The Campus Economy Protocol
 
-OUI MARKET is a comprehensive, professional-grade campus marketplace designed specifically for the Oduduwa University (OUI) community. It empowers students to buy, sell, connect, and earn while providing a secure, trustless environment for all transactions.
+OUI Market is a professional-grade, Web3-powered marketplace designed specifically for Nigerian university students. It combines traditional e-commerce (Jumia style) with a trustless service economy (Fiverr style) and secure housing deposits.
 
----
+## 🏗 Architecture
 
-## 🌟 Key Features
+The platform operates on a "Dual-Layer" architecture:
+1.  **Invisible Web3 Layer**: Smart contracts on Base/Polygon handle value and trust.
+2.  **Professional Fintech Layer**: Traditional UI/UX with card payments and simple login.
 
-### 🛍️ Smart Marketplace
-- **Buy & Sell Anything**: From electronics and textbooks to fashion and food.
-- **Verified Vendors**: Special verification tags for student and local businesses.
-- **Exclusive Campus Deals**: Daily flash deals and student-only discounts.
+### Core Smart Contracts
+- **OuiScore.sol**: An on-chain reputation system. It records completion rates, payment reliability, and student ratings. This score is immutable and can be used by external protocols (like hostel owners) to verify student trustworthiness.
+- **OuiEscrow.sol**: A non-custodial escrow contract that holds cNGN (Naira stablecoin). It features:
+    - **Community Arbitration**: Disputes are resolved by "Diamond Tier" students (highest reputation).
+    - **Auto-Release**: Prevents ghosting by automatically releasing funds 48h after submission if no response is received.
+    - **Safety Fees**: Minimal fees to maintain the protocol and reward community arbiters.
 
-### 💼 Student Gigs & Job Board
-- **Earn While Studying**: List your skills (coding, design, tutoring, delivery) and get hired by fellow students or organizations.
-- **Trustless Escrow**: All job payments are secured via a **Smart Contract Escrow** system. Funds are only released upon successful completion.
+## 🛡 Security First
+- **Non-Custodial**: No admin or backend can touch student funds. Only contract logic moves money.
+- **CEI Pattern**: All contracts follow the Checks-Effects-Interactions pattern to prevent reentrancy.
+- **SafeERC20**: Uses OpenZeppelin's SafeERC20 to handle all Naira token transfers safely.
 
-### 🏠 Housing & Renting Hub
-- **Verified Listings**: Find rooms, apartments, and hostels near campus.
-- **Agent Verification**: Only verified agents and landlords can list properties.
-- **Direct Communication**: Call or message landlords directly from the app.
+## 💳 Account Abstraction (Invisible Blockchain)
+OUI Market uses ERC-4337 to make blockchain invisible:
+- **Social Login**: Students sign up with Google or Phone (via Privy/Web3Auth).
+- **Gas Sponsorship**: The OUI Paymaster covers all gas fees. Students pay 0 gas.
+- **Fiat Bridge**: Card payments via Paystack are instantly converted to cNGN and deposited into the student's smart wallet.
 
-### 💬 Professional Communication
-- **P2P Chat System**: Real-time messaging between buyers, sellers, and agents.
-- **AI Support Chat**: 24/7 customer support pop-up for instant assistance.
-- **Rich Messaging**: Support for images, attachments, and status updates.
+## 🚀 Deployment
 
-### 💳 Secure Payments
-- **Multi-Currency Support**: Pay with Nigerian Naira (NGN) or Cryptocurrency (USDT/ETH).
-- **Payment Methods**: Card payments, bank transfers, and crypto wallet transfers.
-- **Secure Escrow**: Protection for both buyers and sellers on high-value items and services.
+1.  Configure `.env` using `.env.example`.
+2.  Deploy protocol:
+    ```bash
+    npx hardhat run scripts/deploy.js --network base_mainnet
+    ```
 
-### 🛡️ Security & Reliability
-- **Rate Limiting**: Protection against spam and automated abuse.
-- **Vendor Verification**: Identity verification process for all sellers.
-- **Cookie Management**: Professional cookie consent and privacy handling.
-
----
-
-## 🚀 Technical Stack
-
-- **Frontend**: React 18, Vite, Tailwind CSS 4
-- **UI Components**: Shadcn UI (Radix UI)
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **State Management**: React Hooks
-- **Routing**: Hash-based Routing for SPA stability
-- **Payment Simulation**: Smart Contract Escrow Logic
-
----
-
-## 🛠️ Getting Started
-
-1. **Clone the repository**
-2. **Install dependencies**:
-   ```bash
-   pnpm install
-   ```
-3. **Run the development server**:
-   ```bash
-   pnpm dev
-   ```
-4. **Build for production**:
-   ```bash
-   pnpm build
-   ```
-
----
-
-## 📁 Project Structure
-
-```text
-src/
-├── app/
-│   ├── components/       # UI Components & Sections
-│   │   ├── ui/           # Shadcn UI Base Components
-│   │   ├── ChatSystem    # P2P Messaging Logic
-│   │   ├── VendorPortal  # Vendor Registration & Dashboard
-│   │   ├── JobMarketplace# Gig Economy & Escrow
-│   │   └── ...           # Hero, Header, Footer, etc.
-│   └── App.tsx           # Main Application & Routing
-├── styles/               # Global & Theme Styles
-└── main.tsx              # Entry Point
-```
-
----
-
-## 📄 Documentation
-
-### Vendor Verification Process
-To get a **Verification Tag**, vendors must:
-1. Register on the [Vendor Portal](file:///c%3A/Users/Admin/Desktop/OUI%20MARKET/src/app/components/VendorPortal.tsx).
-2. Upload a valid Student ID or NIN.
-3. Pass the manual review process (simulated).
-
-### Smart Contract Escrow
-For Job listings:
-1. Client posts a gig with a budget.
-2. Student applies and is selected.
-3. Client deposits funds into the **Escrow Contract**.
-4. Student completes the work.
-5. Client approves, and funds are released to the student's wallet.
-
----
-
-## 🛡️ License
-
-Private Property of OUI Market Team. All Rights Reserved.
+## 🛠 Tech Stack
+- **Frontend**: React + Tailwind + Framer Motion
+- **Smart Contracts**: Solidity + Hardhat
+- **Chain**: Base (Primary) / Polygon
+- **Wallet**: ERC-4337 Smart Accounts
+- **Payments**: Paystack (Fiat In/Out)

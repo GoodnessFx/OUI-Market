@@ -20,6 +20,7 @@ import { ProductListing } from "./components/ProductListing";
 import { HelpCenter } from "./components/HelpCenter";
 import { UserDashboard } from "./components/UserDashboard";
 import { ReportIssue } from "./components/ReportIssue";
+import { TaskMarketplace } from "./components/TaskMarketplace";
 import { useState, useEffect } from "react";
 import { useStore } from "./components/utils/store";
 
@@ -54,7 +55,9 @@ export default function App() {
     switch (currentPath) {
       case "#/vendor":
         return <VendorPortal />;
-      case "#/jobs":
+      case "#/tasks":
+        return <TaskMarketplace />;
+      case "#/help":
         return <JobMarketplace />;
       case "#/chat":
         return <ChatSystem />;

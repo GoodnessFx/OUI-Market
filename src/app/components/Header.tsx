@@ -49,6 +49,13 @@ export function Header() {
           <div className="flex items-center justify-between h-10 text-xs">
             <div className="flex items-center gap-6">
               {/* Top links removed as per user request for professional look */}
+              <button 
+                onClick={() => window.location.hash = "#/tasks"}
+                className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-bold uppercase tracking-wider text-[10px]"
+              >
+                <Briefcase className="h-3.5 w-3.5" />
+                <span>Task Gigs</span>
+              </button>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative" ref={accountMenuRef}>
